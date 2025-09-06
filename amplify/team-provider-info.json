@@ -1,0 +1,21 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-contactmanagement-dev-deployment",
+      "UnauthRoleName": "amplify-contactmanagement-dev-unauthRole",
+      "StackName": "amplify-contactmanagement-dev",
+      "AuthRoleName": "amplify-contactmanagement-dev-authRole",
+      "UnauthRoleArn": "arn:aws:iam::123456789012:role/amplify-contactmanagement-dev-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::123456789012:role/amplify-contactmanagement-dev-authRole"
+    },
+    "categories": {
+      "api": {
+        "contactapi": {}
+      },
+      "storage": {
+        "contacttable": {}
+      }
+    }
+  }
+}

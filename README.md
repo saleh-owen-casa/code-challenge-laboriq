@@ -104,9 +104,9 @@ Retrieves all contacts (limited fields for overview).
 2. **Set Environment Variables**
    Create a `.env` file in the root directory:
    ```
-   AWS_REGION=us-east-1
-   AWS_ACCESS_KEY_ID=your-access-key
-   AWS_SECRET_ACCESS_KEY=your-secret-key
+   APP_AWS_REGION=us-east-1
+   APP_AWS_ACCESS_KEY_ID=your-access-key
+   APP_AWS_SECRET_ACCESS_KEY=your-secret-key
    ```
 
 3. **Create DynamoDB Table**

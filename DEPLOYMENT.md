@@ -1,59 +1,52 @@
 # Amplify CI/CD Deployment Guide
 
-## Issue Resolution: "Failed to pull the backend"
+## ✅ **Single-Step Deployment Solution**
 
-This error occurs when trying to pull a backend that doesn't exist yet in AWS. Here's how to fix it:
+The project is now configured for **single-step deployment** that creates both frontend and backend resources in one go.
 
-## ✅ **Solution: Two-Step Deployment Process**
+## 🚀 **Deployment Process**
 
-### **Step 1: Deploy Frontend Only (Initial Deployment)**
+### **Step 1: Deploy to Amplify Console**
 
-1. **Use the simplified `amplify.yml`** (current version)
-2. **Deploy to Amplify Console:**
+1. **Connect Repository:**
+   - Go to AWS Amplify Console
    - Connect your Git repository
-   - The build will only deploy the frontend
-   - No backend resources will be created yet
+   - Select the branch to deploy
 
-### **Step 2: Add Backend Resources (After Frontend is Deployed)**
+2. **Set Environment Variables:**
+   - `APP_AWS_ACCESS_KEY_ID` - Your AWS access key
+   - `APP_AWS_SECRET_ACCESS_KEY` - Your AWS secret key
+   - `APP_AWS_REGION` - AWS region (default: us-east-1)
 
-1. **SSH into your Amplify environment** or use AWS CLI locally
-2. **Run the initialization script:**
-   ```bash
-   ./init-amplify.sh
-   ```
-3. **Or manually add resources:**
-   ```bash
-   amplify init
-   amplify add api
-   amplify add storage
-   amplify push
-   ```
+3. **Deploy:**
+   - The build process will automatically:
+     - Install dependencies
+     - Initialize Amplify project
+     - Create API (AppSync)
+     - Create Storage (DynamoDB)
+     - Build frontend
+     - Deploy everything
 
-## 🔧 **Alternative: Manual Backend Setup**
+## 🔧 **How It Works**
 
-If you prefer to set up the backend manually:
+The `amplify.yml` file now includes:
 
-1. **Create DynamoDB Table:**
-   ```bash
-   aws dynamodb create-table \
-     --table-name Contact-dev \
-     --attribute-definitions \
-       AttributeName=recordId,AttributeType=S \
-     --key-schema \
-       AttributeName=recordId,KeyType=HASH \
-     --billing-mode PAY_PER_REQUEST
-   ```
+1. **Backend Phase:**
+   - Creates/updates backend resources using `amplifyPush --simple`
 
-2. **Create AppSync API:**
-   - Go to AWS AppSync Console
-   - Create new API
-   - Use the GraphQL schema from `amplify/backend/api/contactapi/schema.graphql`
+2. **Frontend Phase:**
+   - Installs dependencies
+   - Runs `./amplify/init-backend.sh` to ensure backend exists
+   - Builds the frontend
+   - Deploys to S3
 
-3. **Update Frontend Configuration:**
-   - Update `src/aws-exports.js` with actual API endpoints
-   - Update GraphQL queries if needed
+3. **Backend Initialization Script:**
+   - Checks if project is initialized
+   - Creates API if not exists
+   - Creates Storage if not exists
+   - Handles both new and existing projects
 
-## 📁 **Current Project Structure**
+## 📁 **Project Structure**
 
 ```
 ├── src/
@@ -62,20 +55,34 @@ If you prefer to set up the backend manually:
 │   ├── aws-exports.js
 │   └── graphql/queries.js
 ├── amplify/
-│   ├── backend/api/contactapi/
-│   │   ├── schema.graphql
-│   │   └── contactapi-cloudformation-template.json
-│   └── backend/storage/contacttable/
-│       └── contacttable-cloudformation-template.json
-├── amplify.yml (simplified for frontend-only deployment)
-├── init-amplify.sh (backend initialization script)
+│   ├── backend/
+│   │   ├── api/contactapi/
+│   │   └── storage/contacttable/
+│   ├── .config/
+│   │   ├── project-config.json
+│   │   ├── local-aws-info.json
+│   │   └── local-env-info.json
+│   ├── team-provider-info.json
+│   └── init-backend.sh
+├── amplify.yml
 └── package.json
 ```
 
-## 🚀 **Recommended Deployment Flow**
+## 🎯 **Key Features**
 
-1. **Deploy Frontend:** Use current `amplify.yml` for frontend-only deployment
-2. **Add Backend:** Run `./init-amplify.sh` after frontend is deployed
-3. **Update Configuration:** Update `src/aws-exports.js` with actual endpoints
+- ✅ **Single-step deployment** - No manual intervention needed
+- ✅ **Idempotent** - Safe to run multiple times
+- ✅ **Error handling** - Checks for existing resources
+- ✅ **CI/CD ready** - Works with Amplify Console
+- ✅ **Backend + Frontend** - Creates all resources automatically
 
-This approach avoids the "Failed to pull the backend" error by deploying the frontend first, then adding backend resources.
+## 🔍 **Troubleshooting**
+
+If deployment fails:
+
+1. **Check AWS credentials** are set correctly
+2. **Verify permissions** for DynamoDB and AppSync
+3. **Check build logs** in Amplify Console
+4. **Ensure region** is set correctly
+
+The project is now ready for single-step deployment! 🚀

@@ -8,15 +8,15 @@ if [ "$CI" = "true" ]; then
     echo "Running in CI environment"
     
     # Set up AWS credentials if not already set
-    if [ -z "$AWS_ACCESS_KEY_ID" ]; then
-        echo "AWS credentials not found. Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY"
+    if [ -z "$APP_AWS_ACCESS_KEY_ID" ]; then
+        echo "AWS credentials not found. Please set APP_AWS_ACCESS_KEY_ID and APP_AWS_SECRET_ACCESS_KEY"
         exit 1
     fi
     
     # Configure AWS CLI
-    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    aws configure set default.region $AWS_REGION
+    aws configure set APP_AWS_ACCESS_KEY_ID $APP_AWS_ACCESS_KEY_ID
+    aws configure set APP_AWS_SECRET_ACCESS_KEY $APP_AWS_SECRET_ACCESS_KEY
+    aws configure set default.region $APP_AWS_REGION
 fi
 
 # Initialize Amplify if not already initialized

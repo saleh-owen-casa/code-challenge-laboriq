@@ -4,7 +4,7 @@ frontend:
     preBuild:
       commands:
         - npm install
-        - '# Initialize Amplify project and backend resources'
+        - '# Create backend resources directly'
         - ./amplify/init-backend.sh
     build:
       commands:

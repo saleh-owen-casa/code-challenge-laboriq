@@ -9,9 +9,9 @@ export AWS_SECRET_ACCESS_KEY=${APP_AWS_SECRET_ACCESS_KEY}
 export AWS_REGION=${APP_AWS_REGION:-us-east-1}
 
 # Configure AWS CLI
-aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-aws configure set default.region $AWS_REGION
+# aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+# aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+# aws configure set default.region $AWS_REGION
 
 # Create DynamoDB table
 echo "Creating DynamoDB table..."
@@ -46,7 +46,7 @@ echo "API ID: $API_ID"
 API_KEY=$(aws appsync create-api-key \
   --api-id $API_ID \
   --description "API Key for public access" \
-  --expires $(date -d "+365 days" +%s) \
+  --expires $(gdate -d "+365 days" +%s) \
   --region $AWS_REGION \
   --query 'apiKey.id' \
   --output text)
@@ -75,7 +75,7 @@ aws appsync create-data-source \
   --api-id $API_ID \
   --name ContactTable \
   --type AMAZON_DYNAMODB \
-  --dynamodb-config tableName=Contact-dev,useCallerCredentials=false \
+  --dynamodb-config tableName=Contact-dev,useCallerCredentials=false,awsRegion=$AWS_REGION \
   --region $AWS_REGION
 
 # Update aws-exports.js with actual values

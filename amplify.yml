@@ -1,16 +1,10 @@
 version: 1
-backend:
-  phases:
-    build:
-      commands:
-        - '# Execute Amplify CLI with the helper script'
-        - amplifyPush --simple
 frontend:
   phases:
     preBuild:
       commands:
         - npm install
-        - '# Initialize backend resources'
+        - '# Initialize Amplify project and backend resources'
         - ./amplify/init-backend.sh
     build:
       commands:

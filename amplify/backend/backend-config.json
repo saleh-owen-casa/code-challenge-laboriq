@@ -1,0 +1,50 @@
+{
+  "api": {
+    "contactapi": {
+      "service": "AppSync",
+      "providerPlugin": "awscloudformation",
+      "output": {
+        "authConfig": {
+          "defaultAuthentication": {
+            "authenticationType": "API_KEY",
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 365,
+              "description": "API Key for public access"
+            }
+          },
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ]
+        },
+        "GraphQLAPIIdOutput": "contactapi123456",
+        "GraphQLAPIEndpointOutput": "https://contactapi123456.appsync-api.us-east-1.amazonaws.com/graphql",
+        "GraphQLAPIKeyOutput": "da2-abcdefghijklmnopqrstuvwxyz"
+      },
+      "lastPushTimeStamp": "2024-01-01T00:00:00.000Z"
+    }
+  },
+  "storage": {
+    "contacttable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "contactapi",
+          "attributes": [
+            "GraphQLAPIIdOutput"
+          ]
+        }
+      ],
+      "output": {
+        "Name": "Contact-dev",
+        "Arn": "arn:aws:dynamodb:us-east-1:123456789012:table/Contact-dev",
+        "Region": "us-east-1",
+        "StreamArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Contact-dev/stream/2024-01-01T00:00:00.000"
+      },
+      "lastPushTimeStamp": "2024-01-01T00:00:00.000Z"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+type Contact {
+  recordId: ID!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: String!
+  emailAddress: String!
+  phoneNumber: String
+  homeAddress: String
+  favoriteColor: String
+  createdAt: String
+}
+
+type Query {
+  getContact(recordId: ID!): Contact
+  listContacts: [Contact]
+}
+
+type Mutation {
+  createContact(
+    firstName: String!
+    lastName: String!
+    dateOfBirth: String!
+    emailAddress: String!
+    phoneNumber: String
+    homeAddress: String
+    favoriteColor: String
+  ): Contact
+}
+
+type Subscription {
+  onCreateContact: Contact
+    @aws_subscribe(mutations: ["createContact"])
+}

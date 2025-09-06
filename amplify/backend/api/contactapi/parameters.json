@@ -1,0 +1,6 @@
+{
+  "AppSyncApiName": "contactapi",
+  "AppSyncApiId": "contactapi123456",
+  "APIKeyExpirationEpoch": 0,
+  "env": "dev"
+}

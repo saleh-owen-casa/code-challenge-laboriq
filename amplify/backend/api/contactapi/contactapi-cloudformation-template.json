@@ -1,0 +1,279 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "An auto-generated CloudFormation template for your API.",
+  "Parameters": {
+    "AppSyncApiName": {
+      "Type": "String",
+      "Default": "contactapi"
+    },
+    "AppSyncApiId": {
+      "Type": "String"
+    },
+    "APIKeyExpirationEpoch": {
+      "Type": "Number",
+      "Default": 0
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3DeploymentBucket": {
+      "Type": "String"
+    },
+    "s3DeploymentRootKey": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldCreateAPIKey": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "APIKeyExpirationEpoch"
+            },
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "ContactAPI": {
+      "Type": "AWS::AppSync::GraphQLApi",
+      "Properties": {
+        "Name": {
+          "Ref": "AppSyncApiName"
+        },
+        "AuthenticationType": "API_KEY",
+        "AdditionalAuthenticationProviders": [
+          {
+            "AuthenticationType": "AWS_IAM"
+          }
+        ],
+        "XrayEnabled": true
+      }
+    },
+    "ContactAPIGraphQLSchema": {
+      "Type": "AWS::AppSync::GraphQLSchema",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "Definition": "type Contact {\n  recordId: ID!\n  firstName: String!\n  lastName: String!\n  dateOfBirth: String!\n  emailAddress: String!\n  phoneNumber: String\n  homeAddress: String\n  favoriteColor: String\n  createdAt: String\n}\n\ntype Query {\n  getContact(recordId: ID!): Contact\n  listContacts: [Contact]\n}\n\ntype Mutation {\n  createContact(\n    firstName: String!\n    lastName: String!\n    dateOfBirth: String!\n    emailAddress: String!\n    phoneNumber: String\n    homeAddress: String\n    favoriteColor: String\n  ): Contact\n}\n\ntype Subscription {\n  onCreateContact: Contact\n    @aws_subscribe(mutations: [\"createContact\"])\n}"
+      }
+    },
+    "ContactAPIGraphQLAPIKey": {
+      "Type": "AWS::AppSync::ApiKey",
+      "Condition": "ShouldCreateAPIKey",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "Description": "API Key for public access",
+        "Expires": {
+          "Ref": "APIKeyExpirationEpoch"
+        }
+      }
+    },
+    "ContactAPIGraphQLAPIKeyDefault": {
+      "Type": "AWS::AppSync::ApiKey",
+      "Condition": "ShouldCreateAPIKey",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "Description": "API Key for public access"
+      }
+    },
+    "ContactAPIDataSource": {
+      "Type": "AWS::AppSync::DataSource",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "Name": "ContactTable",
+        "Type": "AMAZON_DYNAMODB",
+        "DynamoDBConfig": {
+          "TableName": {
+            "Ref": "ContactTable"
+          },
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          }
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "ContactAPIDataSourceRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "ContactAPIDataSourceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Sub": [
+            "ContactAPIDataSourceRole-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "ContactAPIDataSourcePolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "ContactTable",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ContactAPIGetContactResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "TypeName": "Query",
+        "FieldName": "getContact",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "ContactAPIDataSource",
+            "Name"
+          ]
+        },
+        "RequestMappingTemplate": "{\n  \"version\": \"2017-02-28\",\n  \"operation\": \"GetItem\",\n  \"key\": {\n    \"recordId\": {\n      \"S\": \"$ctx.args.recordId\"\n    }\n  }\n}",
+        "ResponseMappingTemplate": "$util.toJson($ctx.result)"
+      }
+    },
+    "ContactAPIListContactsResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "TypeName": "Query",
+        "FieldName": "listContacts",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "ContactAPIDataSource",
+            "Name"
+          ]
+        },
+        "RequestMappingTemplate": "{\n  \"version\": \"2017-02-28\",\n  \"operation\": \"Scan\"\n}",
+        "ResponseMappingTemplate": "$util.toJson($ctx.result.Items)"
+      }
+    },
+    "ContactAPICreateContactResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ContactAPI"
+        },
+        "TypeName": "Mutation",
+        "FieldName": "createContact",
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "ContactAPIDataSource",
+            "Name"
+          ]
+        },
+        "RequestMappingTemplate": "{\n  \"version\": \"2017-02-28\",\n  \"operation\": \"PutItem\",\n  \"key\": {\n    \"recordId\": {\n      \"S\": \"$util.autoId()\"\n    }\n  },\n  \"attributeValues\": {\n    \"firstName\": {\n      \"S\": \"$ctx.args.firstName\"\n    },\n    \"lastName\": {\n      \"S\": \"$ctx.args.lastName\"\n    },\n    \"dateOfBirth\": {\n      \"S\": \"$ctx.args.dateOfBirth\"\n    },\n    \"emailAddress\": {\n      \"S\": \"$ctx.args.emailAddress\"\n    },\n    \"phoneNumber\": {\n      \"S\": \"$ctx.args.phoneNumber\"\n    },\n    \"homeAddress\": {\n      \"S\": \"$ctx.args.homeAddress\"\n    },\n    \"favoriteColor\": {\n      \"S\": \"$ctx.args.favoriteColor\"\n    },\n    \"createdAt\": {\n      \"S\": \"$util.time.nowISO8601()\"\n    }\n  }\n}",
+        "ResponseMappingTemplate": "$util.toJson($ctx.result)"
+      }
+    },
+    "ContactTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": [
+            "Contact-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "recordId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "recordId",
+            "KeyType": "HASH"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST"
+      }
+    }
+  },
+  "Outputs": {
+    "GraphQLAPIIdOutput": {
+      "Value": {
+        "Ref": "ContactAPI"
+      }
+    },
+    "GraphQLAPIEndpointOutput": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ContactAPI",
+          "GraphQLUrl"
+        ]
+      }
+    },
+    "GraphQLAPIKeyOutput": {
+      "Value": {
+        "Fn::If": [
+          "ShouldCreateAPIKey",
+          {
+            "Ref": "ContactAPIGraphQLAPIKey"
+          },
+          {
+            "Ref": "ContactAPIGraphQLAPIKeyDefault"
+          }
+        ]
+      }
+    }
+  }
+}

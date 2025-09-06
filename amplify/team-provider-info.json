@@ -1,0 +1,33 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-contactmanagement-dev-123456-authRole",
+      "UnauthRoleName": "amplify-contactmanagement-dev-123456-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::123456789012:role/amplify-contactmanagement-dev-123456-authRole",
+      "UnauthRoleArn": "arn:aws:iam::123456789012:role/amplify-contactmanagement-dev-123456-unauthRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-contactmanagement-dev-123456-deployment",
+      "UnauthRoleName": "amplify-contactmanagement-dev-123456-unauthRole",
+      "StackName": "amplify-contactmanagement-dev-123456",
+      "StackId": "arn:aws:cloudformation:us-east-1:123456789012:stack/amplify-contactmanagement-dev-123456/12345678-1234-1234-1234-123456789012",
+      "AmplifyAppId": "d1234567890abcdef"
+    },
+    "categories": {
+      "api": {
+        "contactapi": {
+          "GraphQLAPIIdOutput": "contactapi123456",
+          "GraphQLAPIEndpointOutput": "https://contactapi123456.appsync-api.us-east-1.amazonaws.com/graphql",
+          "GraphQLAPIKeyOutput": "da2-abcdefghijklmnopqrstuvwxyz"
+        }
+      },
+      "storage": {
+        "contacttable": {
+          "Name": "Contact-dev",
+          "Arn": "arn:aws:dynamodb:us-east-1:123456789012:table/Contact-dev",
+          "Region": "us-east-1",
+          "StreamArn": "arn:aws:dynamodb:us-east-1:123456789012:table/Contact-dev/stream/2024-01-01T00:00:00.000"
+        }
+      }
+    }
+  }
+}

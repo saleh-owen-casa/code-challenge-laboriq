@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "frontend": "javascript",
+  "framework": "none",
+  "config": {
+    "SourceDir": "src",
+    "DistributionDir": "dist",
+    "BuildCommand": "npm run build",
+    "StartCommand": "npm start"
+  }
+}

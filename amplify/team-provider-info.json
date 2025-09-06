@@ -7,7 +7,6 @@
       "UnauthRoleArn": "arn:aws:iam::123456789012:role/amplify-contactmanagement-dev-123456-unauthRole",
       "Region": "us-east-1",
       "DeploymentBucketName": "amplify-contactmanagement-dev-123456-deployment",
-      "UnauthRoleName": "amplify-contactmanagement-dev-123456-unauthRole",
       "StackName": "amplify-contactmanagement-dev-123456",
       "StackId": "arn:aws:cloudformation:us-east-1:123456789012:stack/amplify-contactmanagement-dev-123456/12345678-1234-1234-1234-123456789012",
       "AmplifyAppId": "d1234567890abcdef"

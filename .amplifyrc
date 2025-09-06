@@ -1,5 +1,6 @@
 {
-  "version": "1",
+  "projectName": "contactmanagement",
+  "version": "3.0",
   "frontend": "javascript",
   "framework": "none",
   "config": {
@@ -7,5 +8,8 @@
     "DistributionDir": "dist",
     "BuildCommand": "npm run build",
     "StartCommand": "npm start"
-  }
+  },
+  "providers": [
+    "awscloudformation"
+  ]
 }
